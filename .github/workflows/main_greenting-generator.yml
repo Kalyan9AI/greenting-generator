@@ -30,14 +30,14 @@ jobs:
           npm run test --if-present
           # Remove devDependencies to keep package size smaller for runtime
           npm prune --omit=dev
-          # Create a minimal runtime zip for Next.js SSR
-          zip -r release.zip \
-            .next \
-            public \
-            next.config.ts \
-            package.json \
-            package-lock.json \
-            node_modules
+          # Zip the entire repo from root so package.json and node_modules are at archive root
+          # Exclude git metadata, caches, and the workflow itself; keep node_modules and .next
+          zip -r release.zip . \
+            -x "**/.git/**" \
+               "**/.github/**" \
+               "**/.next/cache/**" \
+               "**/node_modules/.cache/**" \
+               "release.zip"
 
       - name: Upload artifact for deployment job (release.zip)
         uses: actions/upload-artifact@v4
