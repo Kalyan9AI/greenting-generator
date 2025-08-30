@@ -25,15 +25,25 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          npm install
+          npm ci
           npm run build --if-present
           npm run test --if-present
+          # Remove devDependencies to keep package size smaller for runtime
+          npm prune --omit=dev
+          # Create a minimal runtime zip for Next.js SSR
+          zip -r release.zip \
+            .next \
+            public \
+            next.config.ts \
+            package.json \
+            package-lock.json \
+            node_modules
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact for deployment job (release.zip)
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -61,5 +71,6 @@ jobs:
         with:
           app-name: 'greenting-generator'
           slot-name: 'Production'
-          package: .
+          package: release.zip
+          clean: true
           
