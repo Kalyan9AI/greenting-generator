@@ -28,20 +28,14 @@ jobs:
           npm ci
           npm run build --if-present
           npm run test --if-present
-          # Create deployment package from repo root WITHOUT node_modules (let Oryx build on Azure)
-          # Exclude git metadata, caches, and the workflow itself
-          zip -r release.zip . \
-            -x "**/.git/**" \
-               "**/.github/**" \
-               "**/.next/cache/**" \
-               "**/node_modules/**" \
-               "release.zip"
+          # Remove local build artifacts to force Oryx to build on Azure
+          rm -rf node_modules .next
 
-      - name: Upload artifact for deployment job (release.zip)
+      - name: Upload artifact for deployment job (source folder)
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: release.zip
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -69,6 +63,6 @@ jobs:
         with:
           app-name: 'greenting-generator'
           slot-name: 'Production'
-          package: release.zip
+          package: .
           clean: true
           
