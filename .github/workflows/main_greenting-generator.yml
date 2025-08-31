@@ -69,7 +69,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'greenting-generator-d5ardxabcjaxc8a2'
+          app-name: 'greenting-generator'
           slot-name: 'Production'
           package: release.zip
           clean: true
